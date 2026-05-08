@@ -30,7 +30,7 @@ def heavy_attack(atk,dfns):
 
 def excalibur(atk,dfns): #LOL 
     dmg = 0
-    return max(0, (atk*2)-(dfns/10)),
+    return max(0, (atk*3)-(dfns/10)),
 
 #Function Testing
 #atk = float(input("Input Attack Damage: "))
