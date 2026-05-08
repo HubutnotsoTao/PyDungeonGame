@@ -1,8 +1,9 @@
 #Made by Justine Ignacio
 #Simple Dungeon Game
-import random
 import dungeon_gameplay
 import combat_system
+import shop_system
+
 
 #Player class dictionary [Player Health],[Player Speed],[Player Defense] max 100
 #50 is the average
@@ -62,6 +63,31 @@ enemy = {
     }
 }
 
+#Game state dictionary
+game_state = {
+    "player": {
+        "name": "",
+        "class": "",
+        "health": 0,
+        "speed": 0,
+        "defense": 0
+    },
+
+    #Player Currency
+    "currency": {
+        "gold": 100
+    },
+
+    #Player Inventory
+    "inventory": {
+        "weapons": []
+    },
+
+    "floor": 0,
+    "hours": 0,
+    "enemy": {}
+}
+
 #Main Menu dungeon_gameplay
 paths = {
     "dive" : dungeon_gameplay.dive,
@@ -76,29 +102,31 @@ combat = {
 }
 
 class_choice = ""
-
-player_name = ""
 choice = ""
 
-
-
 #Player greeting
-player_name = input("Name yourself: ")
-print(f"\nGreetings {player_name}\n Welcome to the Dungeon!")
+player_name = dungeon_gameplay.start_game()
+game_state["player"]["name"] = player_name
 
 while True:
-        print(f"-"*40)
-        print("[Dive] Enter the Dungeon\n[Shop] Enter the Shop\n[Flee] Return to your Hometown") #Paths
-        choice = input("Choose your path: ").lower()
+    print("-" * 40)
+    print("[Dive] Enter the Dungeon\n[Shop] Enter the Shop\n[Flee] Return")
+    print("-" * 40)
+    choice = input("Choose your path: ").strip().lower()
 
-        if choice.lower() != "flee":
-            dungeon_gameplay.paths.get("choice")
-            
-        elif choice.lower() == "flee":
-            dungeon_gameplay.flee()
+    match choice:
+        case "dive":
+            paths["dive"](game_state, player_class, weapons, enemy)
+
+        case "shop":
+            paths["shop"](game_state)
+
+        case "flee":
+            paths["flee"](game_state)
             break
-        else:
-            paths.get(choice, lambda: print("Thou has chosen a path long forgone, step not into oblivion."))()
+
+        case _:
+            print("Thou has chosen a path long forgone, step not into oblivion.")
 
         
        

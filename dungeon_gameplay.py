@@ -1,70 +1,89 @@
 #Dungeon System
 import random 
+import sys
 
-def dive():
-    #import variables from main game
-    import main_game
-    player_name = main_game.player_name
-    weapon = main_game.weapons
-    enemy = main_game.enemy
-        
-    print("-"*40)
+def start_game():
+    name = input("Name yourself: ")
+    print(f"\nGreetings {name}\nWelcome to the Dungeon!")
+    return name
 
-    #Class selection
+def dive(game_state, player_class, weapons, enemy):
+
+    print("-" * 40)
+
     class_choice = input("Choose your class: ").lower()
 
-    #Set player attributes
-    player_stats = main_game.player_class.get(class_choice)
-    player_health = player_stats["health"]
-    player_speed = player_stats["speed"]
-    player_defense = player_stats["defense"]
+    player_stats = player_class.get(class_choice)
 
-    print("-"*40)
-    print(f"Your class is {class_choice}\nYou shall be known as {player_name} the {class_choice}")
-    print("-"*40)
-    print(f"Your attributes are\nHealth: {player_health}\nSpeed: {player_speed}\nDefense: {player_defense}")
+    if not player_stats:
+        print("Choose an existing class!")
+        return
 
-    #Entering Dungeon
-    print("-"*40)
-    print(f"You are now entering the dungeon...\n")
-    print("-"*40)
-    print(f"{player_name} has entered the dungeon!\n")
-    dungeon_floor = 0
-    dungeon_hours = 15
+    #Store stats into game_state
+    game_state["player"]["class"] = class_choice
+    game_state["player"]["health"] = player_stats["health"]
+    game_state["player"]["speed"] = player_stats["speed"]
+    game_state["player"]["defense"] = player_stats["defense"]
 
+    print("-" * 40)
+    print(f"Your class is {class_choice}")
+    print(f"You are {game_state['player']['name']} the {class_choice}")
+    print("-" * 40)
+
+    print(f"Stats:\nHealth: {game_state['player']['health']}\nSpeed: {game_state['player']['speed']}\nDefense: {game_state['player']['defense']}")
+
+    print("-" * 40)
+    print("You are entering the dungeon...")
+
+    game_state["floor"] = 0
+    game_state["hours"] = 15
+
+    # Main game loop
     while True:
-        #Dungeon procedures and updates
-        print("-"*40)
-        print("Inside the dungeon...\n")
-        print(f"You are currently at floor {dungeon_floor}\n")
-        print(f"{dungeon_hours} hours left until dungeon collapses")
-        print("-"*40)
-        print(f"{main_game.player_name}")
-        print(f"{main_game.player_name} ")
 
-        enemy_list = ("slime","goblin","orc")
+        print("-" * 40)
+        print(f"Floor: {game_state['floor']}")
+        print(f"Hours left: {game_state['hours']}")
+
         enemy_spawn = random.choice(list(enemy.keys()))
+        enemy_stats = enemy[enemy_spawn]
 
-        enemy_health = main_game.enemy.get(enemy_spawn)["health"]
-        enemy_speed = main_game.enemy.get(enemy_spawn)["speed"]
-        enemy_defense = main_game.enemy.get(enemy_spawn)["defense"]
+        # store enemy in state
+        game_state["enemy"] = {
+            "name": enemy_spawn,
+            "health": enemy_stats["health"],
+            "speed": enemy_stats["speed"],
+            "defense": enemy_stats.get("defense", 0)
+        }
 
+        print(f"Enemy: {enemy_spawn}")
 
-        if dungeon_floor >= 10:
-            print(f"Congratulations! {player_name} the {player_class} has cleared the dungeon!")
+        # 
+        if game_state["floor"] >= 10:
+            print(f"The Boss has been vanquished! {game_state['player']['name']} cleared the dungeon!")
             break
+
+        choice = input("[fight] [rest] [flee]: ").lower()
+
+        if choice == "flee":
+            print("You fled the dungeon!")
+            break
+
+        elif choice == "rest":
+            game_state["player"]["health"] += 30
+            game_state["hours"] -= 1
+
+        elif choice == "fight":
+            game_state["floor"] += 1
+
         else:
-            print(f"You have cleared floor {dungeon_floor}!")
-            dungeon_choice = input("[dive] Keep going?\n[rest] Rest for one hour\n[flee] Flee from the dungeon!")
-
-            dungeon_floor += 1
+            print("Invalid choice!")
 
 
 
-def shop():
+def shop(player_name): #Enter shop WIP
     print(f"")
 
-def flee():
-    import main_game
-    print(f"Farewell {main_game.player_name}, your journey ends here.")
+def flee(game_state): #Flee from the dungeon
+    print(f"Farewell {game_state['player']['name']}, your journey ends here.")
     return "flee"
